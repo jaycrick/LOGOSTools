@@ -6,6 +6,7 @@ These were created by using OCR to extract the text from the book, then manually
 The following tasks are things I would consider useful for others, and would love help with.
 * [x] Convert word lists into a machine friendly format, probably JSON.
 * [x] Apply unicode normalization to NFD to both markdown and JSON formats.
+* [x] Create a master word index showing first occurrence by chapter.
 * [ ] Add line number and word index information for the location of the word in the book.
 * [ ] Macronize vocab list.
 
@@ -13,6 +14,30 @@ The following tasks are things I would consider useful for others, and would lov
 To use the lists effectively, I recommend finding a tool that lets you perform diacritic insensitive searches. I use [Obsidian](https://obsidian.md/) with [Omnisearch](https://github.com/scambier/obsidian-omnisearch) to do this from my phone. Better would be if your tool also did fuzzy diacritic insensitive search of some sort. If you forget a word's meaning, look it up in the list to find the chapter to reference back to.
 
 At the top of every file is the page numbers for the exercises of that chapter.
+
+## Scripts
+
+### create_word_index.py
+Creates a master alphabetical index of all vocabulary words across all chapters, showing the chapter number where each word first appears.
+
+**Usage:**
+```bash
+# Creates both JSON and Markdown output (default)
+python3 create_word_index.py
+
+# JSON only
+python3 create_word_index.py --format json
+
+# Markdown only
+python3 create_word_index.py --format markdown
+
+# Custom output filenames
+python3 create_word_index.py --json-output custom_index.json --markdown-output custom_index.md
+```
+
+**Output:**
+- `word_index.json` — Machine-readable format mapping each word to its first chapter
+- `word_index.md` — Formatted markdown table for easy browsing
 
 # Copyright & License
 The copyright of the word lists remain with the original authors, and if they dislike my public reproduction of their lists then I am fully willing to take this repo down. All code and other novel material in this repository is licensed under the terms of the MIT license.
