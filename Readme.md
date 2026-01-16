@@ -22,8 +22,11 @@ Creates a master alphabetical index of all vocabulary words across all chapters,
 
 **Usage:**
 ```bash
-# Creates both JSON and Markdown output (default)
+# Creates all formats: JSON, Markdown, and HTML (default)
 python3 create_word_index.py
+
+# HTML only (best for printing in 3 columns)
+python3 create_word_index.py --format html
 
 # JSON only
 python3 create_word_index.py --format json
@@ -32,12 +35,13 @@ python3 create_word_index.py --format json
 python3 create_word_index.py --format markdown
 
 # Custom output filenames
-python3 create_word_index.py --json-output custom_index.json --markdown-output custom_index.md
+python3 create_word_index.py --html-output custom_index.html --json-output custom_index.json --markdown-output custom_index.md
 ```
 
 **Output:**
 - `word_index.json` — Machine-readable format mapping each word to its first chapter
 - `word_index.md` — Formatted markdown table for easy browsing
+- `word_index.html` — Print-optimized HTML with 3-column layout (open in browser and print to PDF or paper)
 
 # Copyright & License
 The copyright of the word lists remain with the original authors, and if they dislike my public reproduction of their lists then I am fully willing to take this repo down. All code and other novel material in this repository is licensed under the terms of the MIT license.

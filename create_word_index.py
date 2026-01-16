@@ -121,6 +121,99 @@ def save_index_as_markdown(word_index, output_file="word_index.md"):
     print(f"Total unique words: {len(sorted_words)}")
 
 
+def save_index_as_html(word_index, output_file="word_index.html"):
+    """Save the word index as an HTML file optimized for printing in 3 columns"""
+    sorted_words = sorted(word_index.items())
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Word Index</title>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0.5in;
+            line-height: 1.4;
+            background-color: #f5f5f5;
+        }}
+        
+        .container {{
+            background-color: white;
+            padding: 0.5in;
+            column-count: 3;
+            column-gap: 0.4in;
+            column-rule: 1px solid #ddd;
+        }}
+        
+        h1 {{
+            column-span: all;
+            text-align: center;
+            margin-top: 0;
+            font-size: 24px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }}
+        
+        .word-count {{
+            column-span: all;
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }}
+        
+        .word-entry {{
+            margin: 4px 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }}
+        
+        .word {{
+            font-weight: 500;
+            color: #000;
+        }}
+        
+        .chapter {{
+            color: #666;
+            font-size: 0.9em;
+            margin-left: 1em;
+        }}
+        
+        @media print {{
+            body {{
+                margin: 0;
+                background-color: white;
+            }}
+            .container {{
+                margin: 0;
+                padding: 0.5in;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Master Word Index</h1>
+        <div class="word-count">Total unique words: {len(sorted_words)}</div>
+"""
+
+    for word, chapter in sorted_words:
+        html_content += f'        <div class="word-entry"><span class="word">{word}</span><span class="chapter">Ch. {chapter}</span></div>\n'
+
+    html_content += """    </div>
+</body>
+</html>
+"""
+
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    print(f"Index saved to {output_file}")
+    print(f"Total unique words: {len(sorted_words)}")
+
+
 def main():
     import argparse
 
@@ -134,9 +227,9 @@ def main():
     )
     parser.add_argument(
         "--format",
-        choices=["json", "markdown", "both"],
-        default="both",
-        help="Output format (default: both)",
+        choices=["json", "markdown", "html", "all"],
+        default="all",
+        help="Output format: json, markdown, html, or all (default: all)",
     )
     parser.add_argument(
         "--json-output",
@@ -147,6 +240,11 @@ def main():
         "--markdown-output",
         default="word_index.md",
         help="Output markdown filename (default: word_index.md)",
+    )
+    parser.add_argument(
+        "--html-output",
+        default="word_index.html",
+        help="Output HTML filename (default: word_index.html)",
     )
 
     args = parser.parse_args()
@@ -159,11 +257,14 @@ def main():
         return
 
     # Save in requested format(s)
-    if args.format in ["json", "both"]:
+    if args.format in ["json", "all"]:
         save_index_as_json(word_index, args.json_output)
 
-    if args.format in ["markdown", "both"]:
+    if args.format in ["markdown", "all"]:
         save_index_as_markdown(word_index, args.markdown_output)
+
+    if args.format in ["html", "all"]:
+        save_index_as_html(word_index, args.html_output)
 
 
 if __name__ == "__main__":
