@@ -18,30 +18,35 @@ At the top of every file is the page numbers for the exercises of that chapter.
 ## Scripts
 
 ### create_word_index.py
-Creates a master alphabetical index of all vocabulary words across all chapters, showing the chapter number where each word first appears. Sorting is case-insensitive with proper Unicode normalization.
+Creates master alphabetical indexes of all vocabulary words across all chapters, showing the chapter number where each word first appears. Sorting is case-insensitive with proper Unicode normalization.
 
 **Usage:**
 ```bash
-# Creates all formats: JSON, Markdown, and HTML (default)
+# Create regular alphabetical index (all formats: JSON, Markdown, HTML)
 python3 create_word_index.py
 
-# HTML only (best for printing in 3 columns)
-python3 create_word_index.py --format html
+# Include both regular and sectioned indexes
+python3 create_word_index.py --include-sectioned
 
-# JSON only
-python3 create_word_index.py --format json
+# Create only the sectioned index (organized by grammatical sections)
+python3 create_word_index.py --sectioned-only
 
-# Markdown only
-python3 create_word_index.py --format markdown
+# HTML only with custom page density
+python3 create_word_index.py --format html --entries-per-page 90
 
-# Custom output filenames and page density
-python3 create_word_index.py --html-output custom_index.html --entries-per-page 90
+# All formats with custom output filenames
+python3 create_word_index.py --include-sectioned \
+  --json-output my_index.json \
+  --section-json-output my_index_by_section.json
 ```
 
 **Output:**
-- `word_index.json` — Machine-readable format mapping each word to its first chapter
-- `word_index.md` — Formatted markdown table for easy browsing
-- `word_index.html` — Print-optimized HTML with 3-column paginated layout (102 entries per page by default)
+- `word_index.json` — Flat alphabetical index
+- `word_index.md` — Flat alphabetical markdown table
+- `word_index.html` — Print-optimized HTML with 3-column pagination (102 entries/page)
+- `word_index_by_section.json` — Index organized by grammatical sections (14 total)
+- `word_index_by_section.md` — Sectioned markdown with sections as headers
+- `word_index_by_section.html` — Sectioned HTML with responsive column layout (adapts to browser width, up to 4 columns), table of contents with anchor links, and adaptive font sizing for readability
 
 # Copyright & License
 The copyright of the word lists remain with the original authors, and if they dislike my public reproduction of their lists then I am fully willing to take this repo down. All code and other novel material in this repository is licensed under the terms of the MIT license.
