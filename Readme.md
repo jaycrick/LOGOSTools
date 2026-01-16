@@ -18,7 +18,7 @@ At the top of every file is the page numbers for the exercises of that chapter.
 ## Scripts
 
 ### create_word_index.py
-Creates a master alphabetical index of all vocabulary words across all chapters, showing the chapter number where each word first appears.
+Creates a master alphabetical index of all vocabulary words across all chapters, showing the chapter number where each word first appears. Sorting is case-insensitive with proper Unicode normalization.
 
 **Usage:**
 ```bash
@@ -34,14 +34,14 @@ python3 create_word_index.py --format json
 # Markdown only
 python3 create_word_index.py --format markdown
 
-# Custom output filenames
-python3 create_word_index.py --html-output custom_index.html --json-output custom_index.json --markdown-output custom_index.md
+# Custom output filenames and page density
+python3 create_word_index.py --html-output custom_index.html --entries-per-page 90
 ```
 
 **Output:**
 - `word_index.json` — Machine-readable format mapping each word to its first chapter
 - `word_index.md` — Formatted markdown table for easy browsing
-- `word_index.html` — Print-optimized HTML with 3-column layout (open in browser and print to PDF or paper)
+- `word_index.html` — Print-optimized HTML with 3-column paginated layout (102 entries per page by default)
 
 # Copyright & License
 The copyright of the word lists remain with the original authors, and if they dislike my public reproduction of their lists then I am fully willing to take this repo down. All code and other novel material in this repository is licensed under the terms of the MIT license.

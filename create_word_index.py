@@ -6,6 +6,7 @@ Produces an alphabetically sorted list of all unique words with their first chap
 
 import json
 import os
+import unicodedata
 from collections import defaultdict
 from pathlib import Path
 
@@ -94,8 +95,8 @@ def create_word_index(json_dir="json"):
 
 def save_index_as_json(word_index, output_file="word_index.json"):
     """Save the word index as a JSON file"""
-    # Sort alphabetically
-    sorted_index = dict(sorted(word_index.items()))
+    # Sort alphabetically with custom sort key
+    sorted_index = dict(sorted(word_index.items(), key=lambda x: get_sort_key(x[0])))
 
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(sorted_index, f, ensure_ascii=False, indent=2)
@@ -106,7 +107,7 @@ def save_index_as_json(word_index, output_file="word_index.json"):
 
 def save_index_as_markdown(word_index, output_file="word_index.md"):
     """Save the word index as a markdown file"""
-    sorted_words = sorted(word_index.items())
+    sorted_words = sorted(word_index.items(), key=lambda x: get_sort_key(x[0]))
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write("# Master Word Index\n\n")
@@ -121,9 +122,30 @@ def save_index_as_markdown(word_index, output_file="word_index.md"):
     print(f"Total unique words: {len(sorted_words)}")
 
 
-def save_index_as_html(word_index, output_file="word_index.html"):
-    """Save the word index as an HTML file optimized for printing in 3 columns"""
-    sorted_words = sorted(word_index.items())
+def get_sort_key(word):
+    """Generate a sort key that treats uppercase and lowercase as equivalent and strips underscores"""
+    # Strip underscores for sorting
+    clean_word = word.strip("_")
+    # Normalize to NFD (consistent with orig_md_to_json.py) and convert to lowercase for case-insensitive sorting
+    normalized = unicodedata.normalize("NFD", clean_word)
+    return normalized.lower()
+
+
+def format_word_for_html(word):
+    """Format word for HTML, italicizing if surrounded by underscores"""
+    if word.startswith("_") and word.endswith("_"):
+        # Remove underscores and wrap in em tags
+        clean_word = word[1:-1]
+        return f"<em>{clean_word}</em>"
+    return word
+
+
+def save_index_as_html(word_index, output_file="word_index.html", entries_per_page=102):
+    """Save the word index as an HTML file optimized for printing in 3 columns with page breaks"""
+    sorted_words = sorted(word_index.items(), key=lambda x: get_sort_key(x[0]))
+
+    # Calculate entries per column (divide page entries by 3 columns)
+    entries_per_column = entries_per_page // 3
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -132,78 +154,151 @@ def save_index_as_html(word_index, output_file="word_index.html"):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Word Index</title>
     <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
         body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0.5in;
-            line-height: 1.4;
             background-color: #f5f5f5;
         }}
-        
-        .container {{
+
+        .page {{
             background-color: white;
             padding: 0.5in;
-            column-count: 3;
-            column-gap: 0.4in;
-            column-rule: 1px solid #ddd;
+            page-break-after: always;
         }}
-        
-        h1 {{
-            column-span: all;
-            text-align: center;
-            margin-top: 0;
-            font-size: 24px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+
+        .page:last-child {{
+            page-break-after: auto;
         }}
-        
-        .word-count {{
-            column-span: all;
+
+        .header {{
             text-align: center;
-            color: #666;
             margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }}
+
+        h1 {{
+            font-size: 24px;
+            margin-bottom: 5px;
+        }}
+
+        .word-count {{
+            color: #666;
             font-size: 14px;
         }}
-        
+
+        .columns {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4in;
+            column-rule: 1px solid #ddd;
+        }}
+
+        .column {{
+            min-width: 0;
+        }}
+
         .word-entry {{
             margin: 4px 0;
             page-break-inside: avoid;
             break-inside: avoid;
+            line-height: 1.4;
         }}
-        
+
         .word {{
+            font-family: 'SBL Greek','SBL BibLit','New Athena Unicode','DejaVu Sans',Athena,Gentium,'Gentium Plus','Palatino Linotype',Menaion,Times,'Arial Unicode MS','Lucida Sans Unicode','Lucida Grande','Code2000',sans-serif;
             font-weight: 500;
             color: #000;
         }}
-        
+
+        .word em {{
+            font-style: italic;
+            font-weight: 500;
+        }}
+
         .chapter {{
             color: #666;
             font-size: 0.9em;
             margin-left: 1em;
         }}
-        
+
         @media print {{
             body {{
                 margin: 0;
                 background-color: white;
             }}
-            .container {{
+            .page {{
                 margin: 0;
                 padding: 0.5in;
+                min-height: 0;
+            }}
+        }}
+
+        @media screen {{
+            .page {{
+                max-width: 8.5in;
+                margin: 20px auto;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
             }}
         }}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Master Word Index</h1>
-        <div class="word-count">Total unique words: {len(sorted_words)}</div>
 """
 
-    for word, chapter in sorted_words:
-        html_content += f'        <div class="word-entry"><span class="word">{word}</span><span class="chapter">Ch. {chapter}</span></div>\n'
+    # Split words into pages
+    page_num = 0
+    i = 0
+    total_words = len(sorted_words)
 
-    html_content += """    </div>
-</body>
+    while i < total_words:
+        page_num += 1
+        page_words = sorted_words[i : i + entries_per_page]
+
+        # Add page header only on first page
+        if page_num == 1:
+            html_content += f"""    <div class="page">
+        <div class="header">
+            <h1>Master Word Index</h1>
+            <div class="word-count">Total unique words: {total_words}</div>
+        </div>
+        <div class="columns">
+"""
+        else:
+            html_content += """    <div class="page">
+        <div class="columns">
+"""
+
+        # Distribute words into 3 columns
+        words_per_column = len(page_words) // 3
+        remainder = len(page_words) % 3
+
+        col_start = 0
+        for col_num in range(3):
+            # Distribute remainder across first columns
+            col_size = words_per_column + (1 if col_num < remainder else 0)
+            col_words = page_words[col_start : col_start + col_size]
+
+            html_content += '            <div class="column">\n'
+            for word, chapter in col_words:
+                formatted_word = format_word_for_html(word)
+                html_content += f'                <div class="word-entry"><span class="word">{formatted_word}</span><span class="chapter">Ch. {chapter}</span></div>\n'
+            html_content += "            </div>\n"
+
+            col_start += col_size
+
+        html_content += """        </div>
+    </div>
+"""
+
+        i += entries_per_page
+
+    html_content += """</body>
 </html>
 """
 
@@ -212,6 +307,7 @@ def save_index_as_html(word_index, output_file="word_index.html"):
 
     print(f"Index saved to {output_file}")
     print(f"Total unique words: {len(sorted_words)}")
+    print(f"Distributed across {page_num} pages ({entries_per_page} entries per page)")
 
 
 def main():
@@ -246,6 +342,12 @@ def main():
         default="word_index.html",
         help="Output HTML filename (default: word_index.html)",
     )
+    parser.add_argument(
+        "--entries-per-page",
+        type=int,
+        default=102,
+        help="Number of entries per page for HTML output (default: 102)",
+    )
 
     args = parser.parse_args()
 
@@ -264,7 +366,7 @@ def main():
         save_index_as_markdown(word_index, args.markdown_output)
 
     if args.format in ["html", "all"]:
-        save_index_as_html(word_index, args.html_output)
+        save_index_as_html(word_index, args.html_output, args.entries_per_page)
 
 
 if __name__ == "__main__":
