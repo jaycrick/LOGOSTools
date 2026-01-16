@@ -5,9 +5,7 @@ Produces an alphabetically sorted list of all unique words with their first chap
 """
 
 import json
-import os
 import unicodedata
-from collections import defaultdict
 from pathlib import Path
 
 
@@ -473,105 +471,105 @@ def save_index_as_html(word_index, output_file="word_index.html", entries_per_pa
     # Calculate entries per column (divide page entries by 3 columns)
     entries_per_column = entries_per_page // 3
 
-    html_content = f"""<!DOCTYPE html>
+    html_content = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Word Index</title>
     <style>
-        * {{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }}
+        }
 
-        body {{
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
-        }}
+        }
 
-        .page {{
+        .page {
             background-color: white;
             padding: 0.5in;
             page-break-after: always;
-        }}
+        }
 
-        .page:last-child {{
+        .page:last-child {
             page-break-after: auto;
-        }}
+        }
 
-        .header {{
+        .header {
             text-align: center;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #333;
-        }}
+        }
 
-        h1 {{
+        h1 {
             font-size: 24px;
             margin-bottom: 5px;
-        }}
+        }
 
-        .word-count {{
+        .word-count {
             color: #666;
             font-size: 14px;
-        }}
+        }
 
-        .columns {{
+        .columns {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.4in;
             column-rule: 1px solid #ddd;
-        }}
+        }
 
-        .column {{
+        .column {
             min-width: 0;
-        }}
+        }
 
-        .word-entry {{
+        .word-entry {
             margin: 4px 0;
             page-break-inside: avoid;
             break-inside: avoid;
             line-height: 1.4;
-        }}
+        }
 
-        .word {{
+        .word {
             font-family: 'SBL Greek','SBL BibLit','New Athena Unicode','DejaVu Sans',Athena,Gentium,'Gentium Plus','Palatino Linotype',Menaion,Times,'Arial Unicode MS','Lucida Sans Unicode','Lucida Grande','Code2000',sans-serif;
             font-weight: 500;
             color: #000;
-        }}
+        }
 
-        .word em {{
+        .word em {
             font-style: italic;
             font-weight: 500;
-        }}
+        }
 
-        .chapter {{
+        .chapter {
             color: #666;
             font-size: 0.9em;
             margin-left: 1em;
-        }}
+        }
 
-        @media print {{
-            body {{
+        @media print {
+            body {
                 margin: 0;
                 background-color: white;
-            }}
-            .page {{
+            }
+            .page {
                 margin: 0;
                 padding: 0.5in;
                 min-height: 0;
-            }}
-        }}
+            }
+        }
 
-        @media screen {{
-            .page {{
+        @media screen {
+            .page {
                 max-width: 8.5in;
                 margin: 20px auto;
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }}
-        }}
+            }
+        }
     </style>
 </head>
 <body>
