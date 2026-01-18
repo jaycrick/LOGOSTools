@@ -653,18 +653,18 @@ def main():
     )
     parser.add_argument(
         "--json-output",
-        default="word_index.json",
-        help="Output JSON filename (default: word_index.json)",
+        default="generated_indices/word_index.json",
+        help="Output JSON filename (default: generated_indices/word_index.json)",
     )
     parser.add_argument(
         "--markdown-output",
-        default="word_index.md",
-        help="Output markdown filename (default: word_index.md)",
+        default="generated_indices/word_index.md",
+        help="Output markdown filename (default: generated_indices/word_index.md)",
     )
     parser.add_argument(
         "--html-output",
-        default="word_index.html",
-        help="Output HTML filename (default: word_index.html)",
+        default="generated_indices/word_index.html",
+        help="Output HTML filename (default: generated_indices/word_index.html)",
     )
     parser.add_argument(
         "--entries-per-page",
@@ -684,21 +684,25 @@ def main():
     )
     parser.add_argument(
         "--section-json-output",
-        default="word_index_by_section.json",
-        help="Output JSON filename for sectioned index (default: word_index_by_section.json)",
+        default="generated_indices/word_index_by_section.json",
+        help="Output JSON filename for sectioned index (default: generated_indices/word_index_by_section.json)",
     )
     parser.add_argument(
         "--section-markdown-output",
-        default="word_index_by_section.md",
-        help="Output markdown filename for sectioned index (default: word_index_by_section.md)",
+        default="generated_indices/word_index_by_section.md",
+        help="Output markdown filename for sectioned index (default: generated_indices/word_index_by_section.md)",
     )
     parser.add_argument(
         "--section-html-output",
-        default="word_index_by_section.html",
-        help="Output HTML filename for sectioned index (default: word_index_by_section.html)",
+        default="generated_indices/word_index_by_section.html",
+        help="Output HTML filename for sectioned index (default: generated_indices/word_index_by_section.html)",
     )
 
     args = parser.parse_args()
+
+    # Ensure output directories exist
+    out_dir = Path.cwd() / "generated_indices"
+    out_dir.mkdir(exist_ok=True)
 
     # Create regular index unless only sectioned is requested
     if not args.sectioned_only:
